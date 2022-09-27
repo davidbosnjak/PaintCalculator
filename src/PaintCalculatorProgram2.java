@@ -1,25 +1,37 @@
 import java.util.Scanner;
 import javax.swing.JOptionPane;
+import javax.swing.ProgressMonitor;
+import java.math.*;
 public class PaintCalculatorProgram2 {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException{
         final short SQUARE_CM_IN_SQUARE_M = 10000;
-        short METERS_PER_PAINT = 11;
-        double PAINT_IN_CAN = 3.78f;
-        short SEMIGLOSS_PER_WALL = 2;
-        short PRIMER_PER_WALL = 1;
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Please enter length of the room");
-        short roomLength = scanner.nextShort();
-        System.out.println("Please enter height of the room");
-        short roomWidth = scanner.nextShort();
-        System.out.println("Please enter height of the room");
-        short roomHeight = scanner.nextShort();
+        final short METERS_PER_PAINT = 11;
+        final double PAINT_IN_CAN = 3.78;
+        final short SEMIGLOSS_PER_WALL = 2;
+        final short PRIMER_PER_WALL = 1;
+
+        JOptionPane pane = new JOptionPane();
+        ProgressMonitor progressBar = new ProgressMonitor(null, "Calculating paint needed", "note", 0,100);
+        String sLength = pane.showInputDialog("Please enter the length of your room");
+        String sWidth = pane.showInputDialog("Please enter the width of your room");
+        String sHeight = pane.showInputDialog("Please enter the height of your room");
+
+
+
+        short roomLength = Short.parseShort(sLength);
+
+        short roomWidth = Short.parseShort(sWidth);
+
+        short roomHeight = Short.parseShort(sHeight);
+
         int answerCM = getWallArea(roomLength, roomWidth, roomHeight);
-        System.out.println(answerCM);
+
         double answerM = answerCM/SQUARE_CM_IN_SQUARE_M;
-        System.out.println("Surface area: "+answerM);
+
         double paintLitresRequired = answerM / METERS_PER_PAINT;
-        System.out.println("You will need "+paintLitresRequired);
+        BigDecimal paintLitresRequiredRounded = new BigDecimal(paintLitresRequired).setScale(2,RoundingMode.HALF_UP);
+        paintLitresRequired = paintLitresRequiredRounded.doubleValue();
+
         double paintCansRequiredDecimal = paintLitresRequired / PAINT_IN_CAN;
         double primerCansRequiredDecimal = paintCansRequiredDecimal * PRIMER_PER_WALL;
         double semiCansRequiredDecimal = paintCansRequiredDecimal * SEMIGLOSS_PER_WALL;
@@ -28,14 +40,34 @@ public class PaintCalculatorProgram2 {
 
 
         int primerCansRequiredInt  = (int) Math.ceil(primerCansRequiredDecimal);
-
+/*
         System.out.println("You will need "+primerCansRequiredInt+" cans of primer");
         System.out.println("Your calculations for:");
         System.out.println("Length: "+roomLength+"\nWidth: "+roomWidth+"\nHeight: "+roomHeight+"\n");
         System.out.println("Total surface area to be painted: "+answerCM+"cm^2, "+answerM+"m^2");
         System.out.println("Litres of paint required per coat: "+paintLitresRequired);
         System.out.println("Cans of primer needed: "+primerCansRequiredInt+"\nCans of semi-gloss needed: "+semiCansRequiredInt);
+*/
+        String sIntro = "Your calulations for: \n length: "+roomLength+" width: "+roomWidth+" height: "+roomHeight+"\n";
+        String sSurfaceArea = "Total surface area to be painted: "+ answerCM+"cm\u00B2 or "+answerM+"m\u00B2";
+        String sLitres = "Litres of paint required per coat: "+paintLitresRequired+"L";
+        String sCans = "Cans of primed required: "+primerCansRequiredInt+"\nCans of semi-gloss required: "+semiCansRequiredInt;
+        for(int i =0; i<=100; i++){
+            Thread.sleep(100);
+            progressBar.setProgress(i);
+            if(i<=30){
+                progressBar.setNote("Calculating surface area...");
+            }
+            else if(i>30 && i<=60){
+                progressBar.setNote("Calculating litres of paint per coat...");
 
+            }
+            else{
+                progressBar.setNote("Calculating cans required...");
+            }
+
+        }
+        pane.showMessageDialog(null, sIntro+sSurfaceArea+sLitres+sCans);
 
 
 
