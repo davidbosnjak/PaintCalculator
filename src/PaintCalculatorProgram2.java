@@ -30,7 +30,7 @@ public class PaintCalculatorProgram2 {
 
         double paintLitresRequired = answerM / METERS_PER_PAINT;
         BigDecimal paintLitresRequiredRounded = new BigDecimal(paintLitresRequired).setScale(2,RoundingMode.HALF_UP);
-        paintLitresRequired = paintLitresRequiredRounded.doubleValue();
+        double dPaintLitresRequiredRounded = paintLitresRequiredRounded.doubleValue();
 
         double paintCansRequiredDecimal = paintLitresRequired / PAINT_IN_CAN;
         double primerCansRequiredDecimal = paintCansRequiredDecimal * PRIMER_PER_WALL;
@@ -49,8 +49,8 @@ public class PaintCalculatorProgram2 {
         System.out.println("Cans of primer needed: "+primerCansRequiredInt+"\nCans of semi-gloss needed: "+semiCansRequiredInt);
 */
         String sIntro = "Your calulations for: \n length: "+roomLength+" width: "+roomWidth+" height: "+roomHeight+"\n";
-        String sSurfaceArea = "Total surface area to be painted: "+ answerCM+"cm\u00B2 or "+answerM+"m\u00B2";
-        String sLitres = "Litres of paint required per coat: "+paintLitresRequired+"L";
+        String sSurfaceArea = "Total surface area to be painted: "+ answerCM+"cm\u00B2 or "+answerM+"m\u00B2\n";
+        String sLitres = "Litres of paint required per coat: "+dPaintLitresRequiredRounded+"L\n";
         String sCans = "Cans of primed required: "+primerCansRequiredInt+"\nCans of semi-gloss required: "+semiCansRequiredInt;
         for(int i =0; i<=100; i++){
             Thread.sleep(100);
@@ -68,6 +68,7 @@ public class PaintCalculatorProgram2 {
 
         }
         pane.showMessageDialog(null, sIntro+sSurfaceArea+sLitres+sCans);
+        System.out.println(paintLitresRequired);
 
 
 
