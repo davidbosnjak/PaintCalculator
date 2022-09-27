@@ -4,6 +4,7 @@ public class PaintCalculatorProgram {
 
     public static void main(String[] args) {
         int SQUARE_CM_IN_SQUARE_M = 10000;
+        //test
         int METERS_PER_PAINT = 11;
         double PAINT_IN_CAN = 3.78f;
         int SEMIGLOSS_PER_WALL = 2;
