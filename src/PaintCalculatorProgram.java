@@ -1,3 +1,6 @@
+import javax.swing.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Scanner;
 import java.text.DecimalFormat;
 public class PaintCalculatorProgram {
@@ -41,6 +44,40 @@ public class PaintCalculatorProgram {
 
 
 
+    }
+    public static short checkJOptionInput(String message){
+        short parsedNumber;
+
+        //infinite loop until an appropriate value is inputted by the user
+        while(true){
+
+            Scanner scanner = new Scanner(System.in);
+            System.out.println(message);
+            String userInput =scanner.nextLine();
+
+            //if a short can successfully be parsed from the input string without error, it will break out of the loop. Otherwise, it will keep asking for a correct input and showing an error message
+            try{
+                parsedNumber = Short.parseShort(userInput);
+                if(parsedNumber <0){
+                    System.out.println("No negative numbers!");
+                }
+                else {
+                    break;
+                }
+            }
+            catch(NumberFormatException e){
+                System.out.println("Error! "+userInput+" is not a valid number!");
+            }
+        }
+        return parsedNumber;
+    }
+    public static double roundDouble(double numToRound, int digitsToShow){
+
+        //using the BigDecimal class to round a double to a variable degree of precision and setting the rounding mode to HALF_UP which is the standard system taught in schools
+        BigDecimal bgNumToRound = new BigDecimal(numToRound).setScale(digitsToShow, RoundingMode.HALF_UP);
+
+        //converting the BigDecimal object to a double and returning it
+        return bgNumToRound.doubleValue();
     }
     public static int getWallArea(int length, int width, int height){
         int returnValue = length*height*2+ width*height*2;

@@ -105,7 +105,8 @@ public class PaintCalculatorProgram2 {
     public static double roundDouble(double numToRound, int digitsToShow){
 
         //using the BigDecimal class to round a double to a variable degree of precision and setting the rounding mode to HALF_UP which is the standard system taught in schools
-        BigDecimal bgNumToRound = new BigDecimal(numToRound).setScale(digitsToShow, RoundingMode.HALF_UP);
+        BigDecimal bgNumToRound = new BigDecimal(numToRound);
+        bgNumToRound = bgNumToRound.round(new MathContext(3));
 
         //converting the BigDecimal object to a double and returning it
         return bgNumToRound.doubleValue();
