@@ -14,7 +14,8 @@ public class PaintCalculatorProgram2 implements ActionListener {
     static String[] roundingChoices = {"Integer", "Double"};
     static JComboBox<String> unitMenu = new JComboBox<>(unitChoices);
 
-    static JComboBox<String> paintVolumeSelector = new JComboBox<>(new String[]{"Default(3.78)", "Custom"});
+    static String[] paintVolumeOptions = {"Default(3.78)","Custom"};
+    static JComboBox<String> paintVolumeSelector = new JComboBox<>(paintVolumeOptions);
 
     static JComboBox<Integer> primerSelector = new JComboBox<>(paintChoices);
     static JComboBox<Integer> semiSelector = new JComboBox<>(paintChoices);
@@ -22,7 +23,7 @@ public class PaintCalculatorProgram2 implements ActionListener {
     static JComboBox<Integer> precisionSelector = new JComboBox<>(precisionChoices);
 
     static JComboBox<String> roundingModeSelector = new JComboBox<>(roundingChoices);
-
+    static final double defaultPaintVolume = 3.78;
 
     static JPanel panel = new JPanel();
 
@@ -114,7 +115,7 @@ public class PaintCalculatorProgram2 implements ActionListener {
         return length*height*2+ width*height*2;
     }
     //method used for error checking inputs in JOptionPane dialog boxes. Use message parameter to set a message for input
-    public static double checkJOptionInput(String message, int mode){
+    public static double checkJOptionInput(String message, int mode, double defaultValue){
 
         double parsedNumber;
         //infinite loop until an appropriate value is inputted by the user
@@ -122,7 +123,10 @@ public class PaintCalculatorProgram2 implements ActionListener {
 
 
             String userInput = JOptionPane.showInputDialog(null, message);
-
+            if(userInput == null){
+                parsedNumber = (short)defaultValue;
+                break;
+            }
             //if a short can successfully be parsed from the input string without error, it will break out of the loop. Otherwise, it will keep asking for a correct input and showing an error message
             try{
                 if(mode ==0) {
@@ -140,12 +144,15 @@ public class PaintCalculatorProgram2 implements ActionListener {
             }catch(NumberFormatException e){
                 JOptionPane.showMessageDialog(null, "Enter a valid number! \n"+userInput+" is not a valid number!","Error!", JOptionPane.ERROR_MESSAGE);
             }
+            catch(Exception e){
+                JOptionPane.showMessageDialog(null, "Exception occured!","Error!", JOptionPane.ERROR_MESSAGE);
+            }
         }
         return parsedNumber;
     }
     //method to round a double to a certain degree of precision
     public static double roundDouble(double numToRound, int digitsToShow){
-
+        if(numToRound == 0) return 0;
         //using the BigDecimal class to round a double to a variable degree of precision and setting the rounding mode to HALF_UP which is the standard system taught in schools
         final int FACTOR = 10;
         int count = 1;
@@ -180,9 +187,9 @@ public class PaintCalculatorProgram2 implements ActionListener {
         //I did not make a JOptionPane object as most of its methods are static and no object is required
 
         //parsing the strings from the input windows into shorts
-        short roomLength = (short) checkJOptionInput("Please enter the length of your room in CM",0);
-        short roomWidth = (short) checkJOptionInput("Please enter the width of your room in CM",0);
-        short roomHeight = (short) checkJOptionInput("Please enter the height of your room in CM",0);
+        short roomLength = (short) checkJOptionInput("Please enter the length of your room in CM",0,0);
+        short roomWidth = (short) checkJOptionInput("Please enter the width of your room in CM",0,0);
+        short roomHeight = (short) checkJOptionInput("Please enter the height of your room in CM",0,0);
 
         //using the getWallArea function to return the surface area of the relevant walls. answer is returned in square centimeters
         //the reason this has to be a double is that answerM below it can have decimals, and in division, at least one variable needs to be a double to get a double as the answer
@@ -271,8 +278,8 @@ public class PaintCalculatorProgram2 implements ActionListener {
     public void actionPerformed(ActionEvent actionEvent) {
         if(actionEvent.getSource() == submitButton){
             double paintVolume;
-            if(paintVolumeSelector.getSelectedItem()== "Default(3.78)"){
-                paintVolume = 3.78;
+            if(paintVolumeSelector.getSelectedItem()== paintVolumeOptions[0]){
+                paintVolume = defaultPaintVolume;
             }
             else{
                 paintVolume = Double.parseDouble((String) paintVolumeSelector.getSelectedItem());
@@ -283,9 +290,14 @@ public class PaintCalculatorProgram2 implements ActionListener {
 
         }
         if(actionEvent.getSource() == (paintVolumeSelector) && paintVolumeSelector.getSelectedItem() == "Custom"){
-            double newVol = checkJOptionInput("Please select new paint volume per can",1);
-            paintVolumeSelector.addItem(String.valueOf(newVol));
-            paintVolumeSelector.setSelectedItem(String.valueOf(newVol));
+            double newVol = checkJOptionInput("Please select new paint volume per can",1,defaultPaintVolume);
+            if(newVol == defaultPaintVolume){
+                paintVolumeSelector.setSelectedItem(paintVolumeOptions[0]);
+            }
+            else {
+                paintVolumeSelector.addItem(String.valueOf(newVol));
+                paintVolumeSelector.setSelectedItem(String.valueOf(newVol));
+            }
         }
         if(actionEvent.getSource() == unitMenu){
             System.out.println("something happened in the menu");
