@@ -235,16 +235,24 @@ public class PaintCalculatorProgram2 implements ActionListener {
                 unitSymbol = "IN";
                 break;
         }
+        //breaking up the output into different strings representing a different part of the message
+
         String sSurfaceArea = "Total surface area to be painted: "+ surfaceAreaInUnit+""+unitSymbol+"\u00B2\n";
+        String sLitres = "Litres of paint required per coat: "+dPaintLitresRequired+"L\n";
+        String sIntro = "Your calculations for: \n length: "+roomLength+" width: "+roomWidth+" height: "+roomHeight+"\n";
+
+
+        String sCans = "Cans of primed required: "+primerCansRequiredInt+"\nCans of semi-gloss required: "+semiCansRequiredInt;
         if(roundingMode == 0){
             int roundedSurfaceArea = (int)Math.floor(surfaceAreaInUnit);
             sSurfaceArea = "Total surface area to be painted: "+ roundedSurfaceArea+""+unitSymbol+"\u00B2\n";
         }
-        //breaking up the output into different strings representing a different part of the message
-        String sIntro = "Your calculations for: \n length: "+roomLength+" width: "+roomWidth+" height: "+roomHeight+"\n";
+        if(dPaintLitresRequired == Math.floor(dPaintLitresRequired)){
+            int intPaintLitresRequired = (int)Math.floor(dPaintLitresRequired);
+            sLitres = "Litres of paint required per coat: "+intPaintLitresRequired+"L\n";
 
-        String sLitres = "Litres of paint required per coat: "+dPaintLitresRequired+"L\n";
-        String sCans = "Cans of primed required: "+primerCansRequiredInt+"\nCans of semi-gloss required: "+semiCansRequiredInt;
+        }
+
 
         //using a for loop going from 0 to 100 to set the progress on my progress bar. using a delay of 100ms for each percentage completion.
         /*for(int i =0; i<=100; i++){
