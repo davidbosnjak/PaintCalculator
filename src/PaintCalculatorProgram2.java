@@ -3,36 +3,43 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.*;
+
 
 
 public class PaintCalculatorProgram2 implements ActionListener {
     public static JButton submitButton = new JButton("Start Calculation");
     static String[] unitChoices = {"Meters","Centimeters","Feet","Inches"};
     static Integer[] paintChoices = {1,2,3,4,5};
+    static Integer[] precisionChoices = {1,2,3,4,5,6};
+    static String[] roundingChoices = {"Integer", "Double"};
+    static JComboBox<String> unitMenu = new JComboBox<>(unitChoices);
 
-    static JComboBox<String> unitMenu = new JComboBox<String>(unitChoices);
+    static JComboBox<String> paintVolumeSelector = new JComboBox<>(new String[]{"Default(3.78)", "Custom"});
 
-    static JComboBox<String> paintVolumeSelector = new JComboBox<String>(new String[]{"Default", "Custom"});
+    static JComboBox<Integer> primerSelector = new JComboBox<>(paintChoices);
+    static JComboBox<Integer> semiSelector = new JComboBox<>(paintChoices);
 
-    static JComboBox<Integer> primerSelector = new JComboBox<Integer>(paintChoices);
-    static JComboBox<Integer> semiSelector = new JComboBox<Integer>(paintChoices);
-    static ProgressMonitor progressBar = new ProgressMonitor(null, "Calculating paint needed", "note", 0,100);
+    static JComboBox<Integer> precisionSelector = new JComboBox<>(precisionChoices);
+
+    static JComboBox<String> roundingModeSelector = new JComboBox<>(roundingChoices);
+
+
     static JPanel panel = new JPanel();
 
 
-    public static void main(String[] args) throws InterruptedException{
+
+    public static void main(String[] args){
 
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle("Paint Calculator");
+        frame.setTitle("Paint Calculator Pro");
         frame.setSize(400,400);
 
         frame.add(panel);
 
         panel.setLayout(null);
 
-        JLabel titleMessage = new JLabel("Paint Calculator Main Menu");
+        JLabel titleMessage = new JLabel("Paint Calculator Pro");
         titleMessage.setFont(new Font("Times", Font.BOLD,20));
         titleMessage.setBounds(50,20,400,25);
         panel.add(titleMessage);
@@ -42,9 +49,9 @@ public class PaintCalculatorProgram2 implements ActionListener {
         panel.add(unitMessage);
 
 
-        ;
+
         unitMenu.addActionListener(new PaintCalculatorProgram2());
-        unitMenu.setBounds(30,80,150,25);
+        unitMenu.setBounds(30,80,120,25);
         panel.add(unitMenu);
 
         submitButton.addActionListener(new PaintCalculatorProgram2());
@@ -56,7 +63,7 @@ public class PaintCalculatorProgram2 implements ActionListener {
         paintVolumeMessage.setBounds(30,110,150,20);
         panel.add(paintVolumeMessage);
 
-        paintVolumeSelector.setBounds(30,130,150,20);
+        paintVolumeSelector.setBounds(30,130,120,20);
         paintVolumeSelector.addActionListener(new PaintCalculatorProgram2());
         panel.add(paintVolumeSelector);
 
@@ -64,9 +71,9 @@ public class PaintCalculatorProgram2 implements ActionListener {
         primerCoats.setBounds(30,160,150,20);
         panel.add(primerCoats);
 
-        primerSelector.setBounds(30,180,150,20);
+        primerSelector.setBounds(30,180,120,20);
         primerSelector.addActionListener(new PaintCalculatorProgram2());
-        Integer defaultPrimer = 2;
+
 
         panel.add(primerSelector);
 
@@ -74,10 +81,30 @@ public class PaintCalculatorProgram2 implements ActionListener {
         semiCoats.setBounds(30,210,150,20);
         panel.add(semiCoats);
 
-        semiSelector.setBounds(30,230,150,20);
+        semiSelector.setBounds(30,230,120,20);
         semiSelector.addActionListener(new PaintCalculatorProgram2());
         panel.add(semiSelector);
+
+
+        JLabel precisionSetLabel = new JLabel("Sig Digs paint volume");
+        precisionSetLabel.setBounds(200,60,200,20);
+        panel.add(precisionSetLabel);
+        precisionSelector.setBounds(200,80,120,20);
+        precisionSelector.addActionListener(new PaintCalculatorProgram2());
+        panel.add(precisionSelector);
+
+        JLabel areaRoundingLabel = new JLabel("Area rounding mode");
+        areaRoundingLabel.setBounds(200,110,180,20);
+        panel.add(areaRoundingLabel);
+
+        roundingModeSelector.setBounds(200,130, 120,20);
+        roundingModeSelector.addActionListener(new PaintCalculatorProgram2());
+        panel.add(roundingModeSelector);
+
+
+
         semiSelector.setSelectedItem(2);
+        precisionSelector.setSelectedItem(3);
 
 
 
@@ -120,20 +147,25 @@ public class PaintCalculatorProgram2 implements ActionListener {
     public static double roundDouble(double numToRound, int digitsToShow){
 
         //using the BigDecimal class to round a double to a variable degree of precision and setting the rounding mode to HALF_UP which is the standard system taught in schools
-        int factor = (int) Math.pow(10,digitsToShow-1);
+        final int FACTOR = 10;
         int count = 1;
-        while(numToRound<100){
-            numToRound *=factor;
+        //creating another variable may seem redundant, but it helps fix a weird but where it doesn't round properly if you pick very small values for dimensions of the room
+        int intNumToRound;
+        while(numToRound<Math.pow(10,digitsToShow-1)){
+            numToRound *=FACTOR;
             count++;
         }
-        numToRound = Math.floor(numToRound);
-        for(int i =1; i<count; i++){
-            numToRound/=factor;
-        }
+        System.out.println(numToRound);
+        intNumToRound= (int)Math.floor(numToRound);
+        numToRound = intNumToRound;
+        System.out.println(numToRound);
+
+        numToRound/=(Math.pow(FACTOR,count-1));
+
 
         return numToRound;
     }
-    public static void openPaintProgram(int unit, double canVolume, int primerPerWall, int semiPerWall) throws InterruptedException{
+    public static void openPaintProgram(int unit, double canVolume, int primerPerWall, int semiPerWall, int sigDigs, int roundingMode) {
         //declaring constants instead of hardcoding them
         final short SQUARE_CM_IN_SQUARE_M = 10000;
         final double SQUARE_FEET_IN_SQUARE_M = 10.7639;
@@ -160,13 +192,13 @@ public class PaintCalculatorProgram2 implements ActionListener {
         double answerM = answerCM/SQUARE_CM_IN_SQUARE_M;
 
         //rounding to 2 decimal places
-        answerM = roundDouble(answerM,2);
+        answerM = roundDouble(answerM,sigDigs);
 
         //using another conversion factor to find litres of paint required. some work went into rounding this value. I found a class called BigDecimal. the constructor takes in a double, and it has several methods and rounding modes
         double paintLitresRequired = answerM / METERS_PER_PAINT;
 
         //rounding to 2 decimal places
-        double dPaintLitresRequired = roundDouble(paintLitresRequired,2);
+        double dPaintLitresRequired = roundDouble(paintLitresRequired,sigDigs);
 
         //More conversion factors to get desired values.
         double paintCansRequiredDecimal = paintLitresRequired / PAINT_IN_CAN;
@@ -196,15 +228,21 @@ public class PaintCalculatorProgram2 implements ActionListener {
                 unitSymbol = "IN";
                 break;
         }
-
+        String sSurfaceArea = "Total surface area to be painted: "+ surfaceAreaInUnit+""+unitSymbol+"\u00B2\n";
+        if(roundingMode == 0){
+            int roundedSurfaceArea = (int)Math.floor(surfaceAreaInUnit);
+            sSurfaceArea = "Total surface area to be painted: "+ roundedSurfaceArea+""+unitSymbol+"\u00B2\n";
+        }
         //breaking up the output into different strings representing a different part of the message
         String sIntro = "Your calculations for: \n length: "+roomLength+" width: "+roomWidth+" height: "+roomHeight+"\n";
-        String sSurfaceArea = "Total surface area to be painted: "+ surfaceAreaInUnit+""+unitSymbol+"\u00B2\n";
+
         String sLitres = "Litres of paint required per coat: "+dPaintLitresRequired+"L\n";
         String sCans = "Cans of primed required: "+primerCansRequiredInt+"\nCans of semi-gloss required: "+semiCansRequiredInt;
 
         //using a for loop going from 0 to 100 to set the progress on my progress bar. using a delay of 100ms for each percentage completion.
-        /*for(int i =0; i<=50; i++){
+        /*for(int i =0; i<=100; i++){
+            ProgressMonitor progressBar = new ProgressMonitor(null, "Calculating paint needed", "note", 0,100);
+
             long startTime = System.currentTimeMillis();
             long elapsedTime = 0L;
             while(elapsedTime<50){
@@ -233,7 +271,7 @@ public class PaintCalculatorProgram2 implements ActionListener {
     public void actionPerformed(ActionEvent actionEvent) {
         if(actionEvent.getSource() == submitButton){
             double paintVolume;
-            if(paintVolumeSelector.getSelectedItem()== "Default"){
+            if(paintVolumeSelector.getSelectedItem()== "Default(3.78)"){
                 paintVolume = 3.78;
             }
             else{
@@ -241,12 +279,8 @@ public class PaintCalculatorProgram2 implements ActionListener {
 
             }
             System.out.println("paint can volume is "+paintVolume);
-            try {
+            openPaintProgram(unitMenu.getSelectedIndex(), paintVolume, (int)primerSelector.getSelectedItem(),  (int)semiSelector.getSelectedItem(), (int)precisionSelector.getSelectedItem(), roundingModeSelector.getSelectedIndex());
 
-                openPaintProgram(unitMenu.getSelectedIndex(), paintVolume, (int)primerSelector.getSelectedItem(),  (int)semiSelector.getSelectedItem());
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
         }
         if(actionEvent.getSource() == (paintVolumeSelector) && paintVolumeSelector.getSelectedItem() == "Custom"){
             double newVol = checkJOptionInput("Please select new paint volume per can",1);
