@@ -15,7 +15,7 @@ public class PaintCalculatorProgram2 implements ActionListener {
     static String[] unitChoices = {"Meters","Centimeters","Feet","Inches"};
     static Integer[] paintChoices = {1,2,3,4,5};
     static Integer[] precisionChoices = {1,2,3,4,5,6};
-    static String[] roundingChoices = {"Integer", "Double"};
+    static String[] roundingChoices = {"Floor", "Half up", "Mr Lauder"};
     static JComboBox<String> unitMenu = new JComboBox<>(unitChoices);
     static String[] paintVolumeOptions = {"Default(3.78)","Custom"};
     static JComboBox<String> paintVolumeSelector = new JComboBox<>(paintVolumeOptions);
@@ -61,7 +61,6 @@ public class PaintCalculatorProgram2 implements ActionListener {
         submitButton.addActionListener(new PaintCalculatorProgram2());
         submitButton.setBounds(200,300,150,30);
         panel.add(submitButton);
-        frame.setVisible(true);
 
         //Adding can volume label
         JLabel paintVolumeMessage = new JLabel("Select can volume:");
@@ -101,7 +100,7 @@ public class PaintCalculatorProgram2 implements ActionListener {
         panel.add(precisionSelector);
 
         //Adding the rounding mode label
-        JLabel areaRoundingLabel = new JLabel("Area rounding mode");
+        JLabel areaRoundingLabel = new JLabel("Rounding mode");
         areaRoundingLabel.setBounds(200,110,180,20);
         panel.add(areaRoundingLabel);
 
@@ -114,6 +113,10 @@ public class PaintCalculatorProgram2 implements ActionListener {
         semiSelector.setSelectedItem(2);
         precisionSelector.setSelectedItem(3);
         roundingModeSelector.setSelectedItem(roundingChoices[1]);
+
+        //making the frame visible
+        frame.setVisible(true);
+
 
     }
     //method to get the surface area of the walls based on dimensions of the room
@@ -165,7 +168,7 @@ public class PaintCalculatorProgram2 implements ActionListener {
         return parsedNumber;
     }
     //method to round a double to a certain degree of precision
-    public static double roundDouble(double numToRound, int digitsToShow){
+    public static double roundDouble(double numToRound, int digitsToShow, int roundingMode){
         //This condition exists because if 0 is picked, there will be an infinite loop as for {XeR}, 0*X = 0
         if(numToRound == 0) return 0;
 
@@ -174,14 +177,40 @@ public class PaintCalculatorProgram2 implements ActionListener {
         final int FACTOR = 10;
         int count = 1;
 
-        int intNumToRound;
         while(numToRound<Math.pow(10,digitsToShow-1)){
             numToRound *=FACTOR;
             count++;
         }
-        intNumToRound= (int)Math.floor(numToRound);
+        int intNumToRound = (int)numToRound;
+
+        if(roundingMode == 0){
+            System.out.println(numToRound);
+            intNumToRound= (int)Math.floor(numToRound);
+            System.out.println(intNumToRound);
+        }
+        else if(roundingMode == 1){
+            intNumToRound = (int)Math.round(numToRound);
+        }
+        else{
+            double fourDigitRound = numToRound*FACTOR;
+            double fourDigitInt = intNumToRound*FACTOR;
+            fourDigitRound = Math.floor(fourDigitRound);
+            if(fourDigitRound-fourDigitInt >=7){
+                fourDigitRound/=FACTOR;
+                fourDigitRound++;
+                intNumToRound = (int)fourDigitRound;
+            }
+            else{
+                fourDigitRound /=FACTOR;
+                intNumToRound = (int)fourDigitRound;
+            }
+
+
+        }
+
         numToRound = intNumToRound;
         numToRound/=(Math.pow(FACTOR,count-1));
+        System.out.println(numToRound);
         return numToRound;
     }
     public static void openPaintProgram(int unit, double canVolume, int primerPerWall, int semiPerWall, int sigDigs, int roundingMode) {
@@ -210,13 +239,13 @@ public class PaintCalculatorProgram2 implements ActionListener {
         double answerM = answerCM/SQUARE_CM_IN_SQUARE_M;
 
         //rounding to 3 significant digits
-        answerM = roundDouble(answerM, sigDigs);
+        answerM = roundDouble(answerM, sigDigs, roundingMode);
 
         //using another conversion factor to find litres of paint required.
         double paintLitresRequired = answerM / METERS_PER_PAINT;
 
         //rounding to 3 sig digs
-        double dPaintLitresRequired = roundDouble(paintLitresRequired,sigDigs);
+        double PaintLitresRequired = roundDouble(paintLitresRequired,sigDigs, roundingMode);
 
         //More conversion factors to get desired values.
         double paintCansRequiredDecimal = paintLitresRequired / PAINT_IN_CAN;
@@ -229,7 +258,7 @@ public class PaintCalculatorProgram2 implements ActionListener {
         double surfaceAreaInUnit = answerM;
         //setting up conversion into the users desired unit. Notice that "unit" is an integer. I tried to use enumeration instead but passing the index of what was selected in the menu was more convenient for me
         //using conversion factors to calculate values in new units. Also setting the unit symbol
-        String unitSymbol = "M";
+        String unitSymbol = "m";
         switch(unit){
             case 0:
                 surfaceAreaInUnit = answerM;
@@ -248,30 +277,32 @@ public class PaintCalculatorProgram2 implements ActionListener {
                 unitSymbol = "in";
                 break;
         }
+
+
         //breaking up the output into different strings representing a different part of the message
 
         String sSurfaceArea = "Total surface area to be painted: "+ surfaceAreaInUnit+""+unitSymbol+"\u00B2\n";
-        String sLitres = "Litres of paint required per coat: "+dPaintLitresRequired+"L\n";
+        String sLitres = "Litres of paint required per coat: "+PaintLitresRequired+"L\n";
         String sIntro = "Your calculations for: \n length: "+roomLength+" width: "+roomWidth+" height: "+roomHeight+"\n";
 
 
         String sCans = "Cans of primed required: "+primerCansRequiredInt+"\nCans of semi-gloss required: "+semiCansRequiredInt;
 
         //using the rounded (floored) value if the rounding mode is set to integer
-        int roundedSurfaceArea = (int)Math.floor(surfaceAreaInUnit);
-        if(roundingMode == 0){
-            sSurfaceArea = "Total surface area to be painted: "+ roundedSurfaceArea+""+unitSymbol+"\u00B2\n";
-        }
+
+
+
 
         //Using this to prevent the showing of an extra decimal if the value happens to be a whole number
-        if(dPaintLitresRequired == Math.floor(dPaintLitresRequired)){
-            int intPaintLitresRequired = (int)Math.floor(dPaintLitresRequired);
+        if(PaintLitresRequired == Math.floor(PaintLitresRequired)){
+            int intPaintLitresRequired = (int)Math.floor(PaintLitresRequired);
             sLitres = "Litres of paint required per coat: "+intPaintLitresRequired+"L\n";
 
         }
 
         //Using this to prevent the showing of an extra decimal if the value happens to be a whole number
         if(surfaceAreaInUnit == Math.floor(surfaceAreaInUnit)){
+            int roundedSurfaceArea = (int) Math.floor(surfaceAreaInUnit);
             sSurfaceArea = "Total surface area to be painted: "+ roundedSurfaceArea+""+unitSymbol+"\u00B2\n";
 
         }

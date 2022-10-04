@@ -101,20 +101,27 @@ public class PaintCalculatorProgram {
         //This method works by multiplying a given decimal by 10 until it's an x digit number, once it's an x digit number we floor it, and we're left with only x digits.
         //Then we divide it by the same number we multiplied it by, and we're left with a decimal of x significant digits
         final int FACTOR = 10;
-        int count = 1;
+        int count = 0;
 
-        int intNumToRound;
-        while(numToRound<Math.pow(10,digitsToShow-1)){
+
+        while(numToRound<Math.pow(10,digitsToShow)){
+
             numToRound *=FACTOR;
             count++;
         }
-
-        intNumToRound= (int)Math.floor(numToRound);
+        double fourDigitRound = numToRound;
+        numToRound = numToRound/FACTOR;
+        int intNumToRound= (int)Math.floor(numToRound);
         numToRound = intNumToRound;
+        int intFourDigit = (int) Math.floor(fourDigitRound);
+        intNumToRound *=10;
+        if(intFourDigit - intNumToRound >=7){
 
+            numToRound++;
+            System.out.println(numToRound);
+        }
 
         numToRound/=(Math.pow(FACTOR,count-1));
-
 
         return numToRound;
     }
